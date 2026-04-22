@@ -1,24 +1,16 @@
 const io = require('socket.io')(process.env.PORT || 3000, {
-    cors: { origin: "*", methods: ["GET", "POST"] }
+    cors: {
+        origin: "*", // Esto permite que CUALQUIER página se conecte
+        methods: ["GET", "POST"]
+    }
 });
 
-let jugadoresConectados = 0;
-let saqueInicial = Math.random() < 0.5 ? 'AZUL' : 'ROJO'; // El servidor decide
+console.log("Servidor funcionando...");
 
 io.on('connection', (socket) => {
-    jugadoresConectados++;
-    console.log('Jugador conectado. Total:', jugadoresConectados);
-
-    // Cuando alguien se conecta, le enviamos quién debe sacar
-    socket.emit('configuracion_inicial', {
-        equipoQueSaca: saqueInicial
-    });
+    console.log('Jugador conectado:', socket.id);
 
     socket.on('disparo', (datos) => {
         socket.broadcast.emit('oponente_mueve', datos);
-    });
-
-    socket.on('disconnect', () => {
-        jugadoresConectados--;
     });
 });
